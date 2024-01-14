@@ -2,6 +2,7 @@
 
 This project can detect CI supported by rsp server
 
+The -w is an optional parameter
 ```text
 python main.py -s <server URL> -c <certificate name id> [-w <saved file name>]
 ```
@@ -30,10 +31,14 @@ This return value represents a normal return
    "cert": "MIICtzCCAl2..."
 }
 ````
+Reference link
+
+https://www.gsma.com/esim/wp-content/uploads/2023/05/SGP.22-v2.5.pdf#page=187
 
 # 中文版本
 这个项目可以检测rsp服务器支持的CI
 
+其中-w是可选参数
 ```text
 python main.py -s <服务器URL> -c <证书名id> [-w <保存的文件名>]
 ```
@@ -62,3 +67,7 @@ python main.py -s <服务器URL> -c <证书名id> [-w <保存的文件名>]
   "cert": "MIICtzCCAl2..."
 }
 ````
+
+参考链接
+
+https://www.gsma.com/esim/wp-content/uploads/2023/05/SGP.22-v2.5.pdf#page=187
