@@ -1,6 +1,6 @@
 # gsma-rsp-available-checker
 
-This project can detect CI supported by rsp server
+This project can detect CI supported by rsp server, Requires python version 3.8
 
 The -w is an optional parameter
 ```text
@@ -36,7 +36,7 @@ Reference link
 https://www.gsma.com/esim/wp-content/uploads/2023/05/SGP.22-v2.5.pdf#page=187
 
 # 中文版本
-这个项目可以检测rsp服务器支持的CI
+这个项目可以检测rsp服务器支持的CI，需要python 3.8版本
 
 其中-w是可选参数
 ```text

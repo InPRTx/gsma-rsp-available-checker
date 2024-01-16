@@ -1,13 +1,14 @@
+from __future__ import annotations
+
 import argparse
 import base64
 import json
 import os
 import re
+import ssl
+import urllib.request
 
-import urllib3
-
-http = urllib3.PoolManager(cert_reqs='CERT_NONE')
-urllib3.disable_warnings()
+context = ssl._create_unverified_context()
 
 
 def get_euicc_info(cert_str: str) -> str:
@@ -25,15 +26,18 @@ def get_url_data(host: str, cert_str: str, file_name: str | None):
             "euiccInfo1": get_euicc_info(cert_str)}
     headers = {'User-Agent': 'curl/7.88.1',
                'Content-Type': 'application/json'}
+
     try:
-        r = http.request('POST', f'https://{host}/gsma/rsp2/es9plus/initiateAuthentication', body=json.dumps(data),
-                         headers=headers)
+        req = urllib.request.Request(f'https://{host}/gsma/rsp2/es9plus/initiateAuthentication',
+                                     data=json.dumps(data).encode('utf-8'),
+                                     headers=headers)
+        r = urllib.request.urlopen(req, context=context)
     except:
         print({'status': 'error'})
     else:
         if r.status // 200 != 1:
             print({'status': 'error'})
-        if output_str := r.json().get('serverCertificate'):
+        if output_str := json.loads(r.read().decode('utf-8')).get('serverCertificate'):
             print({'status': 'success', 'cert': output_str})
             if file_name:
                 open(file_name, 'wb').write(base64.b64decode(output_str))
