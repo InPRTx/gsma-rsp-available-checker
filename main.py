@@ -24,8 +24,9 @@ def gen_random_challenge() -> str:
 def get_url_data(host: str, cert_str: str, file_name: str | None):
     data = {"smdpAddress": host, "euiccChallenge": gen_random_challenge(),
             "euiccInfo1": get_euicc_info(cert_str)}
-    headers = {'User-Agent': 'curl/7.88.1',
-               'Content-Type': 'application/json'}
+    headers = {'Content-Type': 'application/json',
+               'User-Agent': 'gsma-rsp-lpad',
+               'X-Admin-Protocol': 'gsma/rsp/v2.2.0'}
 
     try:
         req = urllib.request.Request(f'https://{host}/gsma/rsp2/es9plus/initiateAuthentication',
