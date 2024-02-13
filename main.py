@@ -38,7 +38,7 @@ def get_url_data(host: str, cert_str: str, file_name: str | None):
     else:
         if r.status // 200 != 1:
             print(json.dumps({"status": "error"}))
-        if output_str := json.loads(r.read().decode('utf-8')).get('serverCertificate'):
+        if output_str := json.loads(r.read().decode('utf-8')).get('serverCertificate').replace('\n', ''):
             print(json.dumps({"status": "success", "cert": output_str}))
             if file_name:
                 open(file_name, 'wb').write(base64.b64decode(output_str))
