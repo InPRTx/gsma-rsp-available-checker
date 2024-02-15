@@ -51,8 +51,8 @@ def get_url_data(host: str, cert_str: str, file_name: str | None):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-s', help='服务器URL地址')
-    parser.add_argument('-c', help='证书KI')
+    parser.add_argument('-s', required=True, help='服务器URL地址')
+    parser.add_argument('-c', required=True, help='证书KI')
     parser.add_argument('-w', help='保存文件名')
     args = parser.parse_args()
     if not re.match(r'^[0-9a-fA-F]{40}$', args.c):
