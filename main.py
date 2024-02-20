@@ -1,4 +1,6 @@
 from __future__ import annotations
+from cryptography import x509
+from cryptography.hazmat.backends import default_backend
 
 import argparse
 import base64
@@ -39,14 +41,19 @@ def get_url_data(host: str, cert_str: str, file_name: str | None):
         if r.status // 200 != 1:
             print(json.dumps({"status": "error", "statuscode": r.status}))
         if resp := r.read().decode('utf-8'):
-            if output_str := json.loads(resp.replace(r'\n', '')).get('serverCertificate'):
-                print(json.dumps({"status": "success", "cert": output_str}))
-                if file_name:
-                    open(file_name, 'wb').write(base64.b64decode(output_str))
+            if cert := json.loads(resp.replace(r'\n', '')).get('serverCertificate'):
+                certificate = x509.load_der_x509_certificate(base64.b64decode(cert), default_backend())
+                keyid = certificate.extensions.get_extension_for_oid(x509.ExtensionOID.AUTHORITY_KEY_IDENTIFIER)
+                if keyid.value.key_identifier.hex() == cert_str:
+                    print(json.dumps({"status": "success", "cert": cert}))
+                    if file_name:
+                        open(file_name, 'wb').write(base64.b64decode(cert))
+                else:
+                    print(json.dumps({"status": "fail", "reason": "KeyIDMismatch", "cert": cert}))
             else:
-                print(json.dumps({"status": "fail", "resp": json.loads(resp).get('header')}))
+                print(json.dumps({"status": "fail", "reason": "CertNotFound", "resp": json.loads(resp).get('header')}))
         else:
-            print(json.dumps({"status": "fail"}))
+            print(json.dumps({"status": "fail", "reason": "none"}))
 
 
 if __name__ == '__main__':
