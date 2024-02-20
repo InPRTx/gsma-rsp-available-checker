@@ -43,13 +43,14 @@ def get_url_data(host: str, cert_str: str, file_name: str | None):
         if resp := r.read().decode('utf-8'):
             if cert := json.loads(resp.replace(r'\n', '')).get('serverCertificate'):
                 certificate = x509.load_der_x509_certificate(base64.b64decode(cert), default_backend())
-                keyid = certificate.extensions.get_extension_for_oid(x509.ExtensionOID.AUTHORITY_KEY_IDENTIFIER)
-                if keyid.value.key_identifier.hex() == cert_str:
-                    print(json.dumps({"status": "success", "cert": cert}))
+                keyid = certificate.extensions.get_extension_for_oid(
+                    x509.ExtensionOID.AUTHORITY_KEY_IDENTIFIER).value.key_identifier.hex()
+                if keyid == cert_str:
+                    print(json.dumps({"status": "success", "keyID": keyid, "cert": cert}))
                     if file_name:
                         open(file_name, 'wb').write(base64.b64decode(cert))
                 else:
-                    print(json.dumps({"status": "fail", "reason": "KeyIDMismatch", "cert": cert}))
+                    print(json.dumps({"status": "fail", "reason": "KeyIDMismatch", "keyID": keyid,  "cert": cert}))
             else:
                 print(json.dumps({"status": "fail", "reason": "CertNotFound", "resp": json.loads(resp).get('header')}))
         else:
