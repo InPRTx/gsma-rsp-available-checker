@@ -30,7 +30,7 @@ def gen_pki(cert: bytes) -> bytes:
     return gen_tlv(tag, cert)
 
 
-def gen_pki_list(tag: bytes, cert_str: str) -> bytes:
+def gen_pki_list(cert_str: str) -> bytes:
     certs = cert_str.split(',')
     pki_list = b''
     for cert in certs:
@@ -38,16 +38,15 @@ def gen_pki_list(tag: bytes, cert_str: str) -> bytes:
             cert = bytes.fromhex(cert)
             pki_list += gen_pki(cert)
         else:
-            raise ValueError('证书应为40位0-f或0-F,多条证书以逗号隔开')
-    return gen_tlv(tag, pki_list)
+            print(json.dumps({"status": "warning", "reason": "skip invalid cert string:" + cert}))
+    if not pki_list:
+        raise ValueError('无有效证书,证书应为40位0-f或0-F,多条证书以逗号隔开')
+    return gen_tlv(b'\xA9', pki_list) + gen_tlv(b'\xAA', pki_list)
 
 
 def gen_euicc_info(cert_str: str) -> str:
     tag = b'\xBF\x20'
-    euiccinfo = gen_tlv(tag,
-                        gen_svn('2.2.2')
-                        + gen_pki_list(b'\xA9', cert_str)
-                        + gen_pki_list(b'\xAA', cert_str))
+    euiccinfo = gen_tlv(tag, gen_svn('2.2.2') + gen_pki_list(cert_str))
     return base64.encodebytes(euiccinfo).decode().strip()
 
 
